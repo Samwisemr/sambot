@@ -1,0 +1,8 @@
+{
+  "name": "sambot",
+  "version": "1.0.0",
+  "desciption": "Discord bot",
+  "main": "main.py",
+  "author": "Samwisemr",
+  "dependencies": {}
+}
