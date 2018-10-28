@@ -11,6 +11,8 @@ async def say(bot, chan, msg):
     await asyncio.sleep(0.5)
     await bot.send_message(chan, msg)
 
+async def mention(bot, chan,
+
 async def merch(bot, chan):
     await say(bot, chan, 'merch')
 
@@ -61,8 +63,8 @@ if __name__ == '__main__':
         if message.content.lower() == 'omae wa mou shindeiru':
             await say(bot, message.channel, 'NANI??')
 
-        elif message.content.startswith('sambot '):
-            args = message.content[7:]
+        elif message.content.startswith('!sambot '):
+            args = message.content[8:]
 
             if args == 'help':
                 await say(bot, message.channel, 'Fuck you')
