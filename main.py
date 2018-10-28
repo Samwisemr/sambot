@@ -6,14 +6,20 @@ import json
 from discord.utils import get
 
 
-async def merchCommand(bot, channel):
-    await bot.send_typing(channel)
-    await bot.send_message(channel, 'merch')
+async def say(bot, chan, msg):
+    await bot.send_typing(chan)
+    await asyncio.sleep(0.5)
+    await bot.send_message(chan, msg)
+
+
+async def merchCommand(bot, chan):
+    await say(bot, chan, 'merch')
 
     for i in range(3):
-        await bot.send_typing(channel)
+        await bot.send_typing(chan)
         await asyncio.sleep(0.75)
-        await bot.send_message(channel, 'merch')
+        await bot.send_message(chan, 'merch')
+
 
 
 if __name__ == '__main__':
@@ -29,17 +35,18 @@ if __name__ == '__main__':
         if message.author.bot: return
 
         if message.content.lower() == 'omae wa mou shindeiru':
-            newMessage = 'NANI??'
-
-            await bot.send_typing(message.channel)
-            await bot.send_message(message.channel, newMessage)
-
+            await say(bot, message.channel, 'NANI??')
 
         elif message.content.startswith('sambot '):
             args = message.content[7:]
 
-            if args == 'merch':
+            if args == 'help':
+                await say(bot, message.channel, 'Fuck you')
+            elif args == 'merch':
                 await merchCommand(bot, message.channel)
+
+
+
 
             # if args == 'love me' or msg == 'show me love' or msg == 'show me some love':
             #     async for pastMessage in bot.logs_from(message.channel):
