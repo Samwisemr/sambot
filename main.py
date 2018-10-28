@@ -12,13 +12,22 @@ async def say(bot, chan, msg):
     await bot.send_message(chan, msg)
 
 
-async def merchCommand(bot, chan):
+async def merch(bot, chan):
     await say(bot, chan, 'merch')
 
     for i in range(3):
         await bot.send_typing(chan)
         await asyncio.sleep(0.75)
         await bot.send_message(chan, 'merch')
+
+async def spam(bot, chan, msg):
+    if not msg.mentions:
+        await say(bot, chan, 'You didn\'t mention anyone to spam you idiot')
+        return
+    for member in msg.mentions:
+        for i in range(4):
+            await say(bot, chan, 'Hey' + member.mention)
+
 
 
 
@@ -43,7 +52,9 @@ if __name__ == '__main__':
             if args == 'help':
                 await say(bot, message.channel, 'Fuck you')
             elif args == 'merch':
-                await merchCommand(bot, message.channel)
+                await merch(bot, message.channel)
+            elif args.startswith('spam '):
+                await spam(bot, message.channel, message)
 
 
 
