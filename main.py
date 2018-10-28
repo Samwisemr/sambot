@@ -11,7 +11,6 @@ async def say(bot, chan, msg):
     await asyncio.sleep(0.5)
     await bot.send_message(chan, msg)
 
-
 async def merch(bot, chan):
     await say(bot, chan, 'merch')
 
@@ -85,6 +84,13 @@ if __name__ == '__main__':
             #             await bot.add_reaction(pastMessage, ':heart:')
             #             return
 
+    @bot.event
+    async def on_member_join(member):
+        await say(bot, member.server.default_channel, 'Welcome to this little crew of sambot worshipers ' + member.mention + '! You idiot')
+
+    @bot.event
+    async def on_server_join(server):
+        await say(bot, server.default_channel, 'Welcome to ME bitchezzz')
 
 
     @bot.event
