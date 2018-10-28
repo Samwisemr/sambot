@@ -28,6 +28,22 @@ async def spam(bot, chan, msg):
         for i in range(4):
             await say(bot, chan, 'Hey' + member.mention)
 
+async def teleport(bot, chan):
+    newChan = await bot.create_channel(chan.server, 'Ben\'s Asshole', type=discord.ChannelType.voice)
+
+    for member in chan.server.members:
+        if member.status == discord.Status.online:
+            if member.voice.voice_channel is not None:
+                await bot.move_member(member, newChan)
+            else:
+                if not member.bot:
+                    await say(bot, chan, 'Hey' + member.mention + ', get in a voice channel so I can teleport you, you idiot')
+
+    await asyncio.sleep(10)
+    await say(bot, chan, 'Ok teleporting ya\'ll back now')
+    await bot.delete_channel(newChan)
+
+
 
 
 
@@ -55,6 +71,10 @@ if __name__ == '__main__':
                 await merch(bot, message.channel)
             elif args.startswith('spam '):
                 await spam(bot, message.channel, message)
+            elif args == 'teleport':
+                await teleport(bot, message.channel)
+            else:
+                await say(bot, message.channel, 'That\'s not a command. You obviously have no clue what you\'re doing you idiot')
 
 
 
