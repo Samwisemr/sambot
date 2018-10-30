@@ -57,14 +57,14 @@ async def teleport(bot, chan):
 
 async def storytime(bot, message):
     string1 = 'Did you ever hear the tragedy of Darth Plagueis "the wise"?'
-    string2 = 'I thought not. It\'s not a story the Jedi would tell you. It\'s a Sith legend. \
-            Darth Plagueis was a Dark Lord of the Sith, so powerful and so wise he could use the \
-            Force to influence the midichlorians to create life... He had such a knowledge of the \
-            dark side that he could even keep the ones he cared about from dying.'
+    string2 = ('I thought not. It\'s not a story the Jedi would tell you. It\'s a Sith legend. '
+            'Darth Plagueis was a Dark Lord of the Sith, so powerful and so wise he could use the '
+            'Force to influence the midichlorians to create life... He had such a knowledge of the '
+            'dark side that he could even keep the ones he cared about from dying.')
     string3 = 'The dark side of the Force is a pathway to many abilities some consider to be unnatural.'
-    string4 = 'He became so powerful... the only thing he was afraid of was losing his power, which eventually, \
-            of course, he did. Unfortunately, he taught his apprentice everything he knew, then his apprentice \
-            killed him in his sleep. It\'s ironic he could save others from death, but not himself.'
+    string4 = ('He became so powerful... the only thing he was afraid of was losing his power, which eventually, '
+            'of course, he did. Unfortunately, he taught his apprentice everything he knew, then his apprentice '
+            'killed him in his sleep. It\'s ironic he could save others from death, but not himself.')
 
     await say(bot, message.channel, string1)
 
@@ -107,7 +107,7 @@ async def on_message(message):
         elif args == 'teleport':
             await teleport(bot, message.channel)
         elif args == 'tell me a story':
-            await storytime(bot, message.channel)
+            await storytime(bot, message)
         else:
             await say(bot, message.channel, 'That\'s not a command. You obviously have no clue what you\'re doing you idiot')
 
