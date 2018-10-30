@@ -11,7 +11,7 @@ async def say(bot, chan, msg):
     await asyncio.sleep(0.5)
     await bot.send_message(chan, msg)
 
-async def mention(bot, chan,
+# async def mention(bot, chan,
 
 async def merch(bot, chan):
     await say(bot, chan, 'merch')
@@ -31,20 +31,29 @@ async def spam(bot, chan, msg):
 
 async def teleport(bot, chan):
     newChan = await bot.create_channel(chan.server, 'Ben\'s Asshole', type=discord.ChannelType.voice)
-
+    membersChannels = []
+    nonVoiceMembers = []
+    
     for member in chan.server.members:
         if member.status == discord.Status.online:
             if member.voice.voice_channel is not None:
+                membersChannels.append((member, member.voice.voice_channel))
                 await bot.move_member(member, newChan)
             else:
                 if not member.bot:
-                    await say(bot, chan, 'Hey' + member.mention + ', get in a voice channel so I can teleport you, you idiot')
+                    nonVoiceMembers.append(member)
+
+    mentions = nonVoiceMembers[0].mention
+    for member in nonVoiceMembers[1:]:
+        mentions += ', ' + member.mention
+    await say(bot, chan, 'Hey' + member.mention + ', get in a voice channel so I can teleport you, you idiot')
 
     await asyncio.sleep(10)
     await say(bot, chan, 'Ok teleporting ya\'ll back now')
+    for pair in membersChannels:
+        await bot.move_member(pair[0], pair[1])
+        
     await bot.delete_channel(newChan)
-
-
 
 
 
