@@ -2,6 +2,7 @@ import discord
 import asyncio
 import aiohttp
 
+from warbandTimes import getTimeTillNextWarband
 
 class Sambot:
     def __init__(self, token):
@@ -30,6 +31,8 @@ class Sambot:
                     await self.teleport(message.channel)
                 elif args == 'tell me a story':
                     await self.storytime(message)
+                elif args == 'warbands' or args == 'warband' or args == 'how long until the next warband?':
+                    await self.wildernessWarbands(message.channel)
                 else:
                     await self.say(message.channel, 'That\'s not a command. You obviously have no clue what you\'re doing you idiot')
             elif message.content.lower() == 'omae wa mou shindeiru':
@@ -127,6 +130,18 @@ class Sambot:
         await self.say(message.channel, string2)
         await self.say(message.channel, string3)
         await self.say(message.channel, string4)
+
+    async def wildernessWarbands(self, chan):
+        hours, minutes = getTimeTillNextWarband()
+        if hours == 0 and minutes == 0:
+            await self.say(chan, 'A warband just started!')
+        elif hours == 0:
+            await self.say(chan, f'The next warband is in {minutes} minutes')
+        elif minutes == 0:
+            await self.say(chan, f'The next warband is in {hours} hours')
+        else:
+            await self.say(chan, f'The next warband is in {hours} hours and {minutes} minutes')
+
 
     def run(self):
         self.client.run(self.token)

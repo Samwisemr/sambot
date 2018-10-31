@@ -1,5 +1,6 @@
 from datetime import datetime
 
+# Warband start times in hours
 sundayTimes = [5, 12, 19]
 mondayTimes = [2, 9, 16, 23]
 tuesdayTimes = [6, 13, 20]
@@ -9,23 +10,23 @@ fridayTimes = [4, 11, 18]
 saturdayTimes = [1, 8, 15, 22]
 
 timesPerDay = []
-timesPerDay.append(sundayTimes)
-timesPerDay.append(mondayTimes)
-timesPerDay.append(tuesdayTimes)
-timesPerDay.append(wednesdayTimes)
-timesPerDay.append(thursdayTimes)
-timesPerDay.append(fridayTimes)
-timesPerDay.append(saturdayTimes)
-
+timesPerDay.append([i * 60 for i in sundayTimes])
+timesPerDay.append([i * 60 for i in mondayTimes])
+timesPerDay.append([i * 60 for i in tuesdayTimes])
+timesPerDay.append([i * 60 for i in wednesdayTimes])
+timesPerDay.append([i * 60 for i in thursdayTimes])
+timesPerDay.append([i * 60 for i in fridayTimes])
+timesPerDay.append([i * 60 for i in saturdayTimes])
 
 def getTimeTillNextWarband():
-    now = datetime.datetime.now()
-    currentDay = now.strftime("%w")
-    currentHour = now.hour
-    currentMinute = now.minute
+    now = datetime.utcnow()
+    currentDay = int(now.strftime('%w'))
+    currentMinutes = now.minute + now.hour * 60
 
     for time in timesPerDay[currentDay]:
-        if currentHour < time:
-            return calculateTimeTill(currentHour, currentMinute, time)
+        if currentMinutes <= time:
+            minutesLeft = time - currentMinutes
+            return minutesLeft // 60, minutesLeft % 60
 
-    return calculateTimeTill(currentHour, currentMinute, 24) +
+    minutesLeft = (24 * 60) - currentMinutes + timesPerDay[(currentDay + 1) % 7][0]
+    return minutesLeft // 60, minutesLeft % 60
