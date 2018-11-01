@@ -68,7 +68,7 @@ class Sambot:
     # async def mention(bot, chan,
 
     async def merch(self, chan):
-        await self.say(self.client, chan, 'merch')
+        await self.say(chan, 'merch')
 
         for i in range(3):
             await self.client.send_typing(chan)
