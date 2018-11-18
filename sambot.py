@@ -46,11 +46,17 @@ class Sambot:
 
         @self.client.event
         async def on_member_join(member):
-            await self.say(member.server.default_channel, 'Welcome to this little crew of sambot worshipers ' + member.mention + '! You idiot')
+            for channel in member.server.channels:
+                if channel.permissions_for(member.server.me).send_messages and channel.type is discord.ChannelType.text:
+                    await self.say(channel, 'Welcome to this little crew of sambot worshipers ' + member.mention + '! You idiot')
+                    break
 
         @self.client.event
         async def on_server_join(server):
-            await self.say(server.default_channel, 'Welcome to ME bitchezzz')
+            for channel in server.channels:
+                if channel.permissions_for(server.me).send_messages and channel.type is discord.ChannelType.text:
+                    await self.say(channel, 'Welcome to ME bitchezzz')
+                    break
 
         @self.client.event
         async def on_ready():
@@ -58,6 +64,13 @@ class Sambot:
             print(self.client.user.name)
             print(self.client.user.id)
             print('------')
+
+            for server in self.client.servers:
+                for channel in server.channels:
+                    if channel.permissions_for(server.me).send_messages and channel.type is discord.ChannelType.text:
+                        await self.say(channel, 'I\'m heeerrreeee')
+                        await self.say(channel, 'you idiots')
+                        break
 
 
     async def say(self, chan, msg):
