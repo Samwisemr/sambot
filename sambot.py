@@ -18,11 +18,11 @@ class Sambot:
             # ignore all bots
             if message.author.bot:
                 return
-            elif message.content.startswith('!sambot '):
+            elif message.content.startswith('!sambot ') or message.content.startswith('/sambot '):
                 args = message.content[8:]
 
                 if args == 'help':
-                    await self.say(message.channel, 'Don\'t ask me')
+                    await self.help(message.channel)
                 elif args == 'hi' or args == 'hello' or args == 'yo' or args == 'hey':
                     await self.say(message.channel, 'aaayo')
                 elif args == 'merch':
@@ -79,6 +79,46 @@ class Sambot:
         await self.client.send_typing(chan)
         await asyncio.sleep(0.5)
         await self.client.send_message(chan, msg)
+
+    async def help(self, chan):
+        msg = '''
+        sambot usage:
+
+        ----
+
+        PREFIX COMMAND [command arguments]
+        or
+        omae wa mou shindeiru
+
+        ----
+
+        PREFIX options:
+            !sambot
+            /sambot
+
+        COMMANDs:
+            help
+                show this help message
+
+            hi | hello | yo | hey
+                say hi to sambot
+
+            merch
+                do the merch dance
+
+            spam MENTION [ADDITIONAL-MENTIONS...]
+                spams whoever is included in MENTIONS
+
+            teleport
+                teleports everyone active in a voice channel to a very special place temporarily
+
+            tell me a story
+                story time with sambot
+
+            warband[s]
+                get time till next wilderness warband
+        '''
+        await self.say(chan, msg)
 
     async def merch(self, chan):
         await self.say(chan, 'merch')
