@@ -23,6 +23,8 @@ class Sambot:
 
                 if args == 'help':
                     await self.say(message.channel, 'Don\'t ask me')
+                elif args == 'hi' or args == 'hello' or args == 'yo' or args == 'hey':
+                    await self.say(message.channel, 'aaayo')
                 elif args == 'merch':
                     await self.merch(message.channel)
                 elif args.startswith('spam '):
@@ -77,8 +79,6 @@ class Sambot:
         await self.client.send_typing(chan)
         await asyncio.sleep(0.5)
         await self.client.send_message(chan, msg)
-
-    # async def mention(bot, chan,
 
     async def merch(self, chan):
         await self.say(chan, 'merch')
