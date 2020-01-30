@@ -186,14 +186,21 @@ class Sambot:
 
     async def wildernessWarbands(self, chan):
         hours, minutes = getTimeTillNextWarband()
+        hoursWord = 'hours'
+        minutesWord = 'minutes'
+        if hours == 1:
+            hoursWord = 'hour'
+        if minutes == 1:
+            minutesWord = 'minute'
+
         if hours == 0 and minutes == 0:
             await self.say(chan, 'A warband just started!')
         elif hours == 0:
-            await self.say(chan, f'The next warband is in {minutes} minutes')
+            await self.say(chan, f'The next warband is in {minutes} {minutesWord}')
         elif minutes == 0:
-            await self.say(chan, f'The next warband is in {hours} hours')
+            await self.say(chan, f'The next warband is in {hours} {hoursWord}')
         else:
-            await self.say(chan, f'The next warband is in {hours} hours and {minutes} minutes')
+            await self.say(chan, f'The next warband is in {hours} {hoursWord} and {minutes} {minutesWord}')
 
 
     def run(self):
