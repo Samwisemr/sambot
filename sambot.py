@@ -1,12 +1,14 @@
 import discord
 import asyncio
 import aiohttp
+import requests
 
 from warbandTimes import getTimeTillNextWarband
 
 class Sambot:
-    def __init__(self, token):
-        self.token = token
+    def __init__(self, discord_token, lotr_token):
+        self.discord_token = discord_token
+        self.lotr_token = lotr_token
         self.client = discord.Client()
 
         self.setup()
@@ -35,6 +37,8 @@ class Sambot:
                     await self.storytime(message)
                 elif args == 'warbands' or args == 'warband' or args == 'how long until the next warband?':
                     await self.wildernessWarbands(message.channel)
+                elif args == 'quote':
+                    await self.quote(message.channel)
                 else:
                     await self.say(message.channel, 'That\'s not a command. You obviously have no clue what you\'re doing you idiot')
             elif message.content.lower() == 'omae wa mou shindeiru':
@@ -206,7 +210,30 @@ class Sambot:
         else:
             await self.say(chan, f'The next warband is in {hours} {hoursWord} and {minutes} {minutesWord}')
 
+    async def quote(self, chan):
+        LOTR_API_URL = 'https://the-one-api.herokuapp.com/v1'
+        headers = {'Authorization': 'Bearer ' + lotr_token}
+
+        try:
+            r = requests.get(LOTR_API_URL + '/quote', headers=headers)
+            json = r.json()
+            data = json['docs']
+            quote = random.choice(data)
+            characterId = quote['character']
+            quoteDialog = quote['dialog']
+
+            r = requests.get(LOTR_API_URL + '/character/' + characterId, headers=headers)
+            json = r.json()
+            characterName = json['name']
+
+            msg = '```' + quoteDialog + '\n\t- ' + characterName + '```'
+
+            await self.say(chan, msg)
+        except:
+            await self.say(chan, 'Hmm I\'m drawing a blank on quotes right now. It\'s not my fault, I promise')
+
+
 
     def run(self):
-        self.client.run(self.token)
+        self.client.run(self.discord_token)
 
