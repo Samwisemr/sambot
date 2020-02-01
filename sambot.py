@@ -1,11 +1,8 @@
 import discord
 import asyncio
 import aiohttp
-<<<<<<< HEAD
 import random
-=======
 import requests
->>>>>>> 154a021c7b96f06198f1b554e19c7ab35e4ad287
 
 from warbandTimes import getTimeTillNextWarband
 
@@ -125,6 +122,9 @@ class Sambot:
 
             warband[s]
                 get time till next wilderness warband
+
+            quote
+                shares some inspirational quotes
         '''
         await self.say(chan, msg)
 
@@ -216,7 +216,7 @@ class Sambot:
 
     async def quote(self, chan):
         LOTR_API_URL = 'https://the-one-api.herokuapp.com/v1'
-        headers = {'Authorization': 'Bearer ' + lotr_token}
+        headers = {'Authorization': 'Bearer ' + self.lotr_token}
 
         try:
             r = requests.get(LOTR_API_URL + '/quote', headers=headers)
