@@ -24,7 +24,7 @@ class Sambot:
                 if args == 'help':
                     await self.help(message.channel)
                 elif args == 'hi' or args == 'hello' or args == 'yo' or args == 'hey':
-                    await self.say(message.channel, 'aaayo')
+                    await self.greeting(message.channel)
                 elif args == 'merch':
                     await self.merch(message.channel)
                 elif args.startswith('spam '):
@@ -119,6 +119,10 @@ class Sambot:
                 get time till next wilderness warband
         '''
         await self.say(chan, msg)
+
+    async def greeting(self, chan):
+        greeting = random.choice(['aaayo', 'Hello there!', 'Ça va?', 'yo', 'Oi mate', 'ciao bud', 'what it do?', 'sup'])
+        await self.say(message.channel, greeting)
 
     async def merch(self, chan):
         await self.say(chan, 'merch')
