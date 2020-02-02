@@ -73,12 +73,12 @@ class Sambot:
             print(self.client.user.id)
             print('------')
 
-            for server in self.client.servers:
-                for channel in server.channels:
-                    if channel.permissions_for(server.me).send_messages and channel.type is discord.ChannelType.text:
-                        await self.say(channel, 'I\'m heeerrreeee')
-                        await self.say(channel, 'you idiots')
-                        break
+            # for server in self.client.servers:
+            #     for channel in server.channels:
+            #         if channel.permissions_for(server.me).send_messages and channel.type is discord.ChannelType.text:
+            #             await self.say(channel, 'I\'m heeerrreeee')
+            #             await self.say(channel, 'you idiots')
+            #             break
 
 
     async def say(self, chan, msg):
