@@ -3,6 +3,7 @@ import asyncio
 import aiohttp
 import random
 import requests
+import re
 
 from warbandTimes import getTimeTillNextWarband
 
@@ -229,6 +230,8 @@ class Sambot:
             r = requests.get(LOTR_API_URL + '/character/' + characterId, headers=headers)
             json = r.json()
             characterName = json['name']
+
+            quoteDialog = re.sub('\s+', ' ', quoteDialog).strip()
 
             msg = '```' + quoteDialog + '\n\t- ' + characterName + '```'
 
