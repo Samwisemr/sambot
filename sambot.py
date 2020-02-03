@@ -4,13 +4,17 @@ import aiohttp
 import random
 import requests
 import re
+from datetime import datetime
+from time import strftime
 
+import lolUtils
 from warbandTimes import getTimeTillNextWarband
 
 class Sambot:
-    def __init__(self, discord_token, lotr_token):
+    def __init__(self, discord_token, lotr_token, riot_token):
         self.discord_token = discord_token
         self.lotr_token = lotr_token
+        self.riot_token = riot_token
         self.client = discord.Client()
 
         self.setup()
@@ -41,8 +45,10 @@ class Sambot:
                     await self.wildernessWarbands(message.channel)
                 elif args == 'quote':
                     await self.quote(message.channel)
+                elif args.startswith('lol '):
+                    await self.leagueOfLegends(message.channel, args[4:])
                 else:
-                    await self.say(message.channel, 'That\'s not a command. You obviously have no clue what you\'re doing you idiot')
+                    await self.say(message.channel, 'That\'s not a command. You obviously have no clue what you\'re doing you idiot\nUse `!sambot help` if you\'re lost')
             elif message.content.lower() == 'omae wa mou shindeiru':
                 await self.say(message.channel, 'NANI??')
 
@@ -126,6 +132,9 @@ class Sambot:
 
             quote
                 shares some inspirational quotes
+
+            lol mh SUMMONER_NAME
+                displays a summary of the summoner's last five games
         '''
         await self.say(chan, msg)
 
@@ -238,6 +247,52 @@ class Sambot:
             await self.say(chan, msg)
         except:
             await self.say(chan, 'Hmm I\'m drawing a blank on quotes right now. It\'s not my fault, I promise')
+
+    async def leagueOfLegends(self, chan, args):
+        if args.startswith('mh '):
+            await self.matchHistory(chan, args[3:])
+        else:
+            await self.say(chan, 'That\'s not a command. You obviously have no clue what you\'re doing you idiot\nUse `!sambot help` if you\'re lost')
+
+    async def matchHistory(self, chan, summonerName):
+        SUMMONER_API_URL = 'https://na1.api.riotgames.com/lol/summoner/v4/summoners/by-name/'
+        MATCHLIST_API_URL = 'https://na1.api.riotgames.com/lol/match/v4/matchlists/by-account/'
+        headers = {'X-Riot-Token': self.riot_token}
+
+        try:
+            r = requests.get(SUMMONER_API_URL + summonerName, headers=headers)
+            json = r.json()
+            accountId = json['accountId']
+
+            payload = {'endIndex': '5'}
+            r = requests.get(MATCHLIST_API_URL + accountId, params=payload, headers=headers)
+            json = r.json()
+
+            matchHistory = []
+            for i, game in enumerate(json['matches']):
+                MATCH_API_URL = 'https://na1.api.riotgames.com/lol/match/v4/matches/'
+                matchId = game['gameId']
+
+                r = requests.get(MATCH_API_URL + str(matchId), headers=headers)
+                gameData = r.json()
+
+                gameTime = lolUtils.getGameTime(game['timestamp'])
+                gameResult = lolUtils.getGameResult(gameData, summonerName)
+                champion = lolUtils.getChampion(game['champion'])
+
+                gameOutput = (gameTime, champion, gameResult)
+
+                matchHistory.append(gameOutput)
+
+            historyOutput = '```'
+            for game in matchHistory:
+                historyOutput = historyOutput + '\n' + game[0] + ' -- ' + game[1] + ' -- ' + game[2] + '\n'
+
+            historyOutput = historyOutput + '```'
+
+            await self.say(chan, historyOutput)
+        except:
+            await self.say(chan, 'I can\'t seem to find a match history for that summoner at the moment. It\'s not my problem so don\'t blame me.')
 
 
 

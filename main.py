@@ -12,10 +12,11 @@ if __name__ == '__main__':
                 data = json.load(jsonFile)
                 discord_token = data['discord_token']
                 lotr_token = data['lotr_token']
+                riot_token = data['riot_token']
             except:
                 print('Error reading file: ' + AUTH_FILE + '. Exiting.')
     else:
         print('File ' + AUTH_FILE + ' could not be found. Exiting.')
 
-    sambot = Sambot(discord_token, lotr_token)
+    sambot = Sambot(discord_token, lotr_token, riot_token)
     sambot.run()
