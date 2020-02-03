@@ -4,6 +4,7 @@ import pytz
 from datetime import datetime
 
 CHAMPION_FILE = 'res/champion.json'
+ID_TO_CHAMPION_FILE = 'res/idToChampion.json'
 
 def getGameTime(timestamp):
     est = pytz.timezone('US/Eastern')
@@ -35,16 +36,14 @@ def getGameResult(game, summonerName):
                 return 'LOSS'
 
 
-def getChampion(champId):
-    if os.path.exists(CHAMPION_FILE):
-        with open(CHAMPION_FILE) as jsonFile:
+def getChampionName(champId):
+    if os.path.exists(ID_TO_CHAMPION_FILE):
+        with open(ID_TO_CHAMPION_FILE) as jsonFile:
             try:
                 data = json.load(jsonFile)
-                for k, v in data['data'].items():
-                    if int(v['key']) == champId:
-                        return v['name']
+                return data[str(champId)]
             except:
-                print('Error reading file: ' + CHAMPION_FILE + '.')
+                print('Error reading file: ' + ID_TO_CHAMPION_FILE + '.')
     else:
-        print('File ' + CHAMPION_FILE + ' could not be found.')
+        print('File ' + ID_TO_CHAMPION_FILE + ' could not be found.')
 

@@ -278,7 +278,7 @@ class Sambot:
 
                 gameTime = lolUtils.getGameTime(game['timestamp'])
                 gameResult = lolUtils.getGameResult(gameData, summonerName)
-                champion = lolUtils.getChampion(game['champion'])
+                champion = lolUtils.getChampionName(game['champion'])
 
                 gameOutput = (gameTime, champion, gameResult)
 
