@@ -47,6 +47,8 @@ class Sambot:
                     await self.quote(message.channel)
                 elif args.startswith('lol '):
                     await self.leagueOfLegends(message.channel, args[4:])
+                elif args == 'I\'m tilted' or args == 'tilt':
+                    await self.tilt(message)
                 else:
                     await self.say(message.channel, 'That\'s not a command. You obviously have no clue what you\'re doing you idiot\nUse `!sambot help` if you\'re lost')
             elif message.content.lower() == 'omae wa mou shindeiru':
@@ -135,6 +137,9 @@ class Sambot:
 
             lol mh SUMMONER_NAME
                 displays a summary of the summoner's last five games
+
+            tilt | I'm tilted
+                puts things into perspective
         '''
         await self.say(chan, msg)
 
@@ -294,6 +299,14 @@ class Sambot:
         except:
             await self.say(chan, 'I can\'t seem to find a match history for that summoner at the moment. It\'s not my problem so don\'t blame me.')
 
+
+    async def tilt(self, message):
+        JACOB_ID = 265584372021723136
+        if message.author.id == JACOB_ID:
+            msg = 'You don\'t fear the tilt, you welcome it. Your punishment must be more severe.'
+        else:
+            msg = 'Ah you think the tilt is your ally? You merely adopted the tilt. Jacob was born in it, molded by it. He didn\'t see a win until he was already a man, by then it was nothing to him but blinding!'
+        await self.say(message.channel, msg)
 
 
     def run(self):
