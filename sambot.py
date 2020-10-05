@@ -48,7 +48,7 @@ class Sambot:
                 elif args.startswith('lol '):
                     await self.leagueOfLegends(message.channel, args[4:])
                 elif args == 'I\'m tilted' or args == 'tilt':
-                    await self.tilt(message)
+                    await self.tilt(message.channel, message)
                 else:
                     await self.say(message.channel, 'That\'s not a command. You obviously have no clue what you\'re doing you idiot\nUse `!sambot help` if you\'re lost')
             elif message.content.lower() == 'omae wa mou shindeiru':
@@ -62,15 +62,15 @@ class Sambot:
 
         @self.client.event
         async def on_member_join(member):
-            for channel in member.server.channels:
-                if channel.permissions_for(member.server.me).send_messages and channel.type is discord.ChannelType.text:
+            for channel in member.guild.channels:
+                if channel.permissions_for(member.guild.me).send_messages and channel.type is discord.ChannelType.text:
                     await self.say(channel, 'Welcome to this little crew of sambot worshipers ' + member.mention + '! You idiot')
                     break
 
         @self.client.event
-        async def on_server_join(server):
-            for channel in server.channels:
-                if channel.permissions_for(server.me).send_messages and channel.type is discord.ChannelType.text:
+        async def on_guild_join(guild):
+            for channel in guild.channels:
+                if channel.permissions_for(guild.me).send_messages and channel.type is discord.ChannelType.text:
                     await self.say(channel, 'Welcome to ME bitchezzz')
                     break
 
@@ -81,18 +81,18 @@ class Sambot:
             print(self.client.user.id)
             print('------')
 
-            # for server in self.client.servers:
-            #     for channel in server.channels:
-            #         if channel.permissions_for(server.me).send_messages and channel.type is discord.ChannelType.text:
+            # for guild in self.client.guild:
+            #     for channel in guild.channels:
+            #         if channel.permissions_for(guild.me).send_messages and channel.type is discord.ChannelType.text:
             #             await self.say(channel, 'I\'m heeerrreeee')
             #             await self.say(channel, 'you idiots')
             #             break
 
 
     async def say(self, chan, msg):
-        await self.client.send_typing(chan)
-        await asyncio.sleep(0.5)
-        await self.client.send_message(chan, msg)
+        async with chan.typing():
+            await asyncio.sleep(0.5)
+            await chan.send(msg)
 
     async def help(self, chan):
         msg = '''
@@ -151,28 +151,28 @@ class Sambot:
         await self.say(chan, 'merch')
 
         for i in range(3):
-            await self.client.send_typing(chan)
-            await asyncio.sleep(0.75)
-            await self.client.send_message(chan, 'merch')
+            async with chan.typing():
+                await asyncio.sleep(0.75)
+                await chan.send('merch')
 
     async def spam(self, chan, msg):
         if not msg.mentions:
-            await self.say(self.client, chan, 'You didn\'t mention anyone to spam you idiot')
+            await self.say(chan, 'You didn\'t mention anyone to spam you idiot')
             return
         for member in msg.mentions:
             for i in range(4):
                 await self.say(chan, 'Hey' + member.mention)
 
     async def teleport(self, chan):
-        newChan = await self.client.create_channel(chan.server, 'Ben\'s Asshole', type=discord.ChannelType.voice)
+        newChan = await chan.guild.create_voice_channel('Ben\'s Asshole')
         membersChannels = []
         nonVoiceMembers = []
 
-        for member in chan.server.members:
+        for member in chan.guild.members:
             if member.status == discord.Status.online:
                 if member.voice.voice_channel is not None:
                     membersChannels.append((member, member.voice.voice_channel))
-                    await self.client.move_member(member, newChan)
+                    await member.move_to(newChan)
                 else:
                     if not member.bot:
                         nonVoiceMembers.append(member)
@@ -185,9 +185,9 @@ class Sambot:
         await asyncio.sleep(10)
         await self.say(chan, 'Ok teleporting ya\'ll back now')
         for pair in membersChannels:
-            await self.client.move_member(pair[0], pair[1])
+            await pair[0].move_to(pair[1])
 
-        await self.client.delete_channel(newChan)
+        await newChan.delete()
 
     async def storytime(self, message):
         string1 = 'Did you ever hear the tragedy of Darth Plagueis "the wise"?'
@@ -203,9 +203,9 @@ class Sambot:
         await self.say(message.channel, string1)
 
         def check(msg):
-            return msg.content.startswith('No') or msg.content.startswith('no')
+            return msg.author == message.author and msg.channel == message.channel and (msg.content.startswith('No') or msg.content.startswith('no'))
 
-        response = await self.client.wait_for_message(timeout=10.0, author=message.author, channel=message.channel, check=check)
+        response = await self.client.wait_for('message', check=check, timeout=10.0)
 
         await self.say(message.channel, string2)
         await self.say(message.channel, string3)
@@ -230,27 +230,30 @@ class Sambot:
             await self.say(chan, f'The next warband is in {hours} {hoursWord} and {minutes} {minutesWord}')
 
     async def quote(self, chan):
-        LOTR_API_URL = 'https://the-one-api.herokuapp.com/v1'
+        LOTR_API_URL = 'https://the-one-api.dev/v2'
         headers = {'Authorization': 'Bearer ' + self.lotr_token}
 
         try:
-            r = requests.get(LOTR_API_URL + '/quote', headers=headers)
-            json = r.json()
-            data = json['docs']
-            quote = random.choice(data)
-            characterId = quote['character']
-            quoteDialog = quote['dialog']
+            async with chan.typing():
+                r = requests.get(LOTR_API_URL + '/quote', headers=headers)
+                json = r.json()
+                data = json['docs']
+                quote = random.choice(data)
+                characterId = quote['character']
+                quoteDialog = quote['dialog']
 
-            r = requests.get(LOTR_API_URL + '/character/' + characterId, headers=headers)
-            json = r.json()
-            characterName = json['name']
+                r = requests.get(LOTR_API_URL + '/character/' + characterId, headers=headers)
+                json = r.json()
+                data = json['docs'][0]
+                characterName = data['name']
 
-            quoteDialog = re.sub('\s+', ' ', quoteDialog).strip()
+                quoteDialog = re.sub('\s+', ' ', quoteDialog).strip()
 
-            msg = '```' + quoteDialog + '\n\t- ' + characterName + '```'
+                msg = '```' + quoteDialog + '\n\t- ' + characterName + '```'
 
-            await self.say(chan, msg)
-        except:
+                await self.say(chan, msg)
+        except Exception as e:
+            print(e)
             await self.say(chan, 'Hmm I\'m drawing a blank on quotes right now. It\'s not my fault, I promise')
 
     async def leagueOfLegends(self, chan, args):
@@ -265,48 +268,49 @@ class Sambot:
         headers = {'X-Riot-Token': self.riot_token}
 
         try:
-            r = requests.get(SUMMONER_API_URL + summonerName, headers=headers)
-            json = r.json()
-            accountId = json['accountId']
+            async with chan.typing():
+                r = requests.get(SUMMONER_API_URL + summonerName, headers=headers)
+                json = r.json()
+                accountId = json['accountId']
 
-            payload = {'endIndex': '5'}
-            r = requests.get(MATCHLIST_API_URL + accountId, params=payload, headers=headers)
-            json = r.json()
+                payload = {'endIndex': '5'}
+                r = requests.get(MATCHLIST_API_URL + accountId, params=payload, headers=headers)
+                json = r.json()
 
-            matchHistory = []
-            for i, game in enumerate(json['matches']):
-                MATCH_API_URL = 'https://na1.api.riotgames.com/lol/match/v4/matches/'
-                matchId = game['gameId']
+                matchHistory = []
+                for i, game in enumerate(json['matches']):
+                    MATCH_API_URL = 'https://na1.api.riotgames.com/lol/match/v4/matches/'
+                    matchId = game['gameId']
 
-                r = requests.get(MATCH_API_URL + str(matchId), headers=headers)
-                gameData = r.json()
+                    r = requests.get(MATCH_API_URL + str(matchId), headers=headers)
+                    gameData = r.json()
 
-                gameTime = lolUtils.getGameTime(game['timestamp'])
-                gameResult = lolUtils.getGameResult(gameData, summonerName)
-                champion = lolUtils.getChampionName(game['champion'])
+                    gameTime = lolUtils.getGameTime(game['timestamp'])
+                    gameResult = lolUtils.getGameResult(gameData, summonerName)
+                    champion = lolUtils.getChampionName(game['champion'])
 
-                gameOutput = (gameTime, champion, gameResult)
+                    gameOutput = (gameTime, champion, gameResult)
 
-                matchHistory.append(gameOutput)
+                    matchHistory.append(gameOutput)
 
-            historyOutput = '```'
-            for game in matchHistory:
-                historyOutput = historyOutput + '\n' + game[0] + ' -- ' + game[1] + ' -- ' + game[2] + '\n'
+                historyOutput = '```'
+                for game in matchHistory:
+                    historyOutput = historyOutput + '\n' + game[0] + ' -- ' + game[1] + ' -- ' + game[2] + '\n'
 
-            historyOutput = historyOutput + '```'
+                historyOutput = historyOutput + '```'
 
-            await self.say(chan, historyOutput)
+                await self.say(chan, historyOutput)
         except:
             await self.say(chan, 'I can\'t seem to find a match history for that summoner at the moment. It\'s not my problem so don\'t blame me.')
 
 
-    async def tilt(self, message):
-        JACOB_ID = 265584372021723136
-        if message.author.id == JACOB_ID:
+    async def tilt(self, chan, message):
+        CONRAD_ID = 265584372021723136
+        if message.author.id == CONRAD_ID:
             msg = 'You don\'t fear the tilt, you welcome it. Your punishment must be more severe.'
         else:
-            msg = 'Ah you think the tilt is your ally? You merely adopted the tilt. Jacob was born in it, molded by it. He didn\'t see a win until he was already a man, by then it was nothing to him but blinding!'
-        await self.say(message.channel, msg)
+            msg = 'Ah you think the tilt is your ally? You merely adopted the tilt. Conrad was born in it, molded by it. He didn\'t see a win until he was already a man, by then it was nothing to him but blinding!'
+        await self.say(chan, msg)
 
 
     def run(self):
